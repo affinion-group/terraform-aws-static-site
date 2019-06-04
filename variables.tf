@@ -1,9 +1,12 @@
 // Gral variables
-variable "domain" {}
+variable "domain" {
+}
 
-variable "site_name" {}
+variable "site_name" {
+}
 
-variable "public_dns_zone" {}
+variable "public_dns_zone" {
+}
 
 variable "acm_certificate_arn" {
   default = ""
@@ -24,3 +27,4 @@ variable "error_response_pagepath" {
 variable "web_acl_id" {
   default = ""
 }
+

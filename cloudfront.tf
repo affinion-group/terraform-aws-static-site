@@ -8,7 +8,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     origin_id   = "S3-${aws_s3_bucket.main.id}"
 
     s3_origin_config {
-      origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path}"
+      origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
     }
   }
 
@@ -46,8 +46,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = "${var.acm_certificate_arn}"
-    iam_certificate_id       = "${var.ssl_cert}"
+    acm_certificate_arn      = var.acm_certificate_arn
+    iam_certificate_id       = var.ssl_cert
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1"
   }
@@ -55,9 +55,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   custom_error_response {
     error_code            = "404"
     error_caching_min_ttl = "0"
-    response_code         = "${var.error_response_code}"
-    response_page_path    = "${var.error_response_pagepath}"
+    response_code         = var.error_response_code
+    response_page_path    = var.error_response_pagepath
   }
 
-  web_acl_id = "${var.web_acl_id}"
+  web_acl_id = var.web_acl_id
 }
+
