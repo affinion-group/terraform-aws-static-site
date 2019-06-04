@@ -62,3 +62,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   web_acl_id = var.web_acl_id
 }
 
+output "cloudfront_distribution_id" {
+  value = aws_cloudfront_distribution.s3_distribution.id
+}
