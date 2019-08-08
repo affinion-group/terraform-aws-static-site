@@ -2,6 +2,43 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "${var.site_name}${var.domain} Created by Terraform"
 }
 
+data "aws_iam_policy_document" "access-logs-write" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.access_logs_bucket.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = ["${aws_s3_bucket.access_logs_bucket.arn}"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+
+  statement {
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.access_logs_bucket.arn}"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn}"]
+    }
+  }
+}
+
+resource "aws_s3_bucket" "access_logs_bucket" {
+  bucket = "${var.site_name}${var.domain}-access-logs"
+  acl    = "private"
+}
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = "${aws_s3_bucket.main.id}.s3.amazonaws.com"
@@ -17,6 +54,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_root_object = "index.html"
 
   aliases = ["${var.site_name}${var.domain}"]
+
+  logging_config {
+    bucket = "${aws_s3_bucket.access_logs_bucket.id}.s3.amazonaws.com"
+  }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
