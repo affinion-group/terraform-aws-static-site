@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "s3_policy" {
 
 resource "aws_s3_bucket" "main" {
   bucket = "${var.site_name}${replace(var.domain, ".", "-")}"
-  acl    = "public-read"
+  acl    = "private"
 
   policy = data.aws_iam_policy_document.s3_policy.json
 
